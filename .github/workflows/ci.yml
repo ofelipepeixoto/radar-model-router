@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-04
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5, resolved 2026-10-04
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Tests
+        run: python -m unittest discover -s tests -v
+      - name: Synthetic evals
+        run: python -m radar_router.evaluate
+      - name: CLI example
+        run: python -m radar_router.cli < examples/input.json
+      - name: n8n contract example
+        run: node tests/n8n-contract.cjs
+      - name: Compile
+        run: python -m compileall -q radar_router tests

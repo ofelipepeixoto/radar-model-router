@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "radar-model-router"
+version = "0.1.0"
+description = "Local, governed model routing experiments for the Radar ecosystem"
+requires-python = ">=3.11"
+authors = [{name = "Carlos Felipe"}]
+license = "MIT"
+dependencies = []
+
+[project.scripts]
+radar-router = "radar_router.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["radar_router*"]
+
+[tool.setuptools.package-data]
+"radar_router.vendor" = ["LICENSE"]

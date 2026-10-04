@@ -1,0 +1,46 @@
+{
+  "name": "Radar Model Router - entrada sintetica (inativo)",
+  "active": false,
+  "nodes": [
+    {
+      "id": "manual",
+      "name": "Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "input",
+      "name": "Entrada sintetica",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const route_input = {session: 'n8n-synthetic', turn: 'demo-1', task: 'draft', risk: 'low', current_tier: 2, continuation: false};\nreturn [{json: {status: 'contract_ready', execution: 'not_connected', route_input}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Manual": {
+      "main": [
+        [
+          {
+            "node": "Entrada sintetica",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
