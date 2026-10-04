@@ -12,7 +12,7 @@ Execução local em 03/10/2026 (America/Sao_Paulo; 04/10 UTC), Python 3.12, dado
 | `python3 -m compileall -q radar_router tests` | OK |
 | Comparação do vendor com upstream | Arquivo e licença sem alterações |
 | Repositório GitHub | Criado em https://github.com/ofelipepeixoto/radar-model-router; independente, não fork |
-| GitHub Actions | Workflow preparado; execução remota não confirmada |
+| GitHub Actions | CI aprovado em Python 3.11 e 3.12 para o commit a8bfc343560377b50bd1df2d52d282620b1907da; testes, evals, CLI, contrato n8n e compile passaram |
 | Hermes/OAuth/n8n real | Não instalado, conectado ou homologado |
 | Vercel | Consulta autenticada retornou zero projetos; nenhum deploy |
 | Composio GitHub | Conexão ativa confirmada para ofelipepeixoto, criação do repositório concluída |
@@ -25,6 +25,10 @@ Testes confirmam: contrato sem prompt/chave, isolamento de tenants/sessões, con
 
 Riscos residuais: caller confiável precisa autenticar; SQLite requer host/volume seguro; início concorrente deve ocorrer após inicialização única; caminho pai precisa ser confiável; retenção é oportunística; reservas não possuem manutenção automática; capacidades reais e integrações externas continuam pendentes. Não usar ledger em functions efêmeras.
 
+## Evidência remota
+
+Execução aprovada: https://github.com/ofelipepeixoto/radar-model-router/actions/runs/37170716005, commit `a8bfc343560377b50bd1df2d52d282620b1907da`. Ambos os jobs `test (3.11)` e `test (3.12)` concluíram com success. Os seis checks funcionais passaram nas duas versões; nenhum provider foi chamado. A atribuição do commit está associada à conta `ofelipepeixoto`.
+
 ## Próximo gate
 
-Concluir autenticação da conta GitHub correta, criar repositório independente, publicar commit e confirmar Actions para esse SHA. Só então registrar CI remoto como aprovado. Não ativar API paga ou workflows operacionais como efeito colateral.
+Para operação real, homologar caller autenticado, capacidades e wrappers no ambiente isolado. API paga e workflows operacionais continuam desabilitados. A confirmação de CI não constitui homologação Hermes/n8n nem economia real.

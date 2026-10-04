@@ -31,7 +31,7 @@ Saída da entrada de exemplo: tier `padrao`, esforço `medium`, modo sombra, API
 
 ## Estado de validação
 
-Testes locais e avaliações sintéticas estão descritos em [docs/VALIDATION.md](docs/VALIDATION.md). Publicação remota, GitHub Actions, Hermes e instância n8n possuem estados separados: não considerar configuração de CI como execução confirmada. Sem economia, qualidade de LLM ou disponibilidade real de modelos comprovadas.
+**53 testes locais passaram** e o [CI remoto](https://github.com/ofelipepeixoto/radar-model-router/actions/runs/37170716005) aprovou Python 3.11 e 3.12, incluindo oito casos sintéticos e o contrato n8n → Python. Detalhes e commit verificado em [docs/VALIDATION.md](docs/VALIDATION.md). Hermes e n8n reais continuam não homologados. Sem economia, qualidade de LLM ou disponibilidade real de modelos comprovadas.
 
 ## Entrada e confiança
 
