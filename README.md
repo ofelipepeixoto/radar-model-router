@@ -57,6 +57,10 @@ A CLI é um laboratório local controlado pelo operador. `Scope` deve ser constr
 
 Leia [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) e [docs/PLUGINS.md](docs/PLUGINS.md).
 
+## Estudo opcional Laya
+
+[Estudo de decisão e avaliação](experiments/laya-study/README.md): contrato autoral, 24 casos fictícios PT-BR e comparação de fixtures com o baseline. Execute `python3 experiments/laya-study/study.py`. A saída identifica inferência não executada e não inclui os textos. O experimento não entra na política do router nem instala Laya/Torch; veja [ADR 002](docs/ADR-002-laya-study.md).
+
 ## Limites
 
 Sem servidor HTTP, MCP, geração LLM, classificador externo, deploy VPS/Vercel ou workflow ativado. Não existe flag de ambiente que habilite API paga. O ledger é um componente testado para integração futura: não substitui executor autenticado, limite de tokens, preço atual verificado e reserva ligada à chamada real. Não há manutenção distribuída ou SLA.

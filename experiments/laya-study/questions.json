@@ -1,0 +1,9 @@
+{
+  "schema": "radar-laya-questions/1",
+  "id": "candidate-tier",
+  "type": "choice",
+  "instructions": "Contrato de estudo: indicar um tier consultivo entre opções finitas. Nunca conceder autorização, reduzir revisão humana ou afirmar que a confiança foi calibrada.",
+  "labels": ["leve", "padrao", "pesado", "maximo"],
+  "option_order": [0, 1, 2, 3],
+  "language": "pt-BR"
+}

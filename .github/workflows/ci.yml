@@ -25,9 +25,11 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Synthetic evals
         run: python -m radar_router.evaluate
+      - name: Laya contract study (synthetic fixtures only)
+        run: python experiments/laya-study/study.py
       - name: CLI example
         run: python -m radar_router.cli < examples/input.json
       - name: n8n contract example
         run: node tests/n8n-contract.cjs
       - name: Compile
-        run: python -m compileall -q radar_router tests
+        run: python -m compileall -q radar_router tests experiments/laya-study

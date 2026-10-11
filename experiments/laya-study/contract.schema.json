@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Radar Laya synthetic observation study, not a runtime adapter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "corpus_sha256", "questions_sha256", "source", "observations"],
+  "properties": {
+    "schema": {"const": "radar-laya-observations/1"},
+    "corpus_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "questions_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "revision", "dtype", "model_revision", "model_sha256"],
+      "properties": {
+        "kind": {"const": "synthetic-fixture"},
+        "revision": {"const": "synthetic-v1"},
+        "dtype": {"const": "fixture"},
+        "model_revision": {"type": "null"},
+        "model_sha256": {"type": "null"}
+      }
+    },
+    "observations": {
+      "type": "array", "minItems": 1, "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["case_id", "status", "probabilities", "abstention", "truncated"],
+        "properties": {
+          "case_id": {"type": "string", "pattern": "^pt-[0-9]{2}$"},
+          "status": {"enum": ["observed", "not_run"]},
+          "probabilities": {
+            "oneOf": [
+              {"type": "null"},
+              {"type": "array", "minItems": 4, "maxItems": 4,
+               "items": {"type": "number", "minimum": 0, "maximum": 1}}
+            ]
+          },
+          "abstention": {"enum": ["passed", "abstained", "unevaluated"]},
+          "truncated": {"type": "boolean"}
+        },
+        "allOf": [{
+          "if": {"properties": {"status": {"const": "not_run"}}},
+          "then": {"properties": {"probabilities": {"type": "null"},
+                                    "abstention": {"const": "unevaluated"},
+                                    "truncated": {"const": false}}},
+          "else": {"properties": {"probabilities": {"type": "array"}}}
+        }]
+      }
+    }
+  },
+  "$comment": "study.py additionally enforces finite non-boolean numbers, sum=1, exact joins and hashes. JSON Schema alone does not verify those semantics. No remote schema resolution is performed."
+}

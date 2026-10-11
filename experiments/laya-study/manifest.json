@@ -1,0 +1,11 @@
+{
+  "schema": "radar-laya-manifest/1",
+  "upstream_code_revision": "c4a805b5160621bbfc53417126990a67d3163bc5",
+  "candidate_min_probability": 0.85,
+  "files": {
+    "corpus.json": "fe1deae63c5abd25b421131529f0c0ac613de6e42af0cacdc6fcb547ee66938b",
+    "questions.json": "b1f38d5c82428eefba7381cd187c90f87993ed940aedfb0a1417077374ff8577",
+    "observations.fixture.json": "4be9df3f3184448364eade61c91a2207b3501dcb36d85eb2fa289a3e7a6b14e6",
+    "contract.schema.json": "581195915e1d4a640dd2775ffd2f8f4b67dd6458e4f02eef374c40ba2860f701"
+  }
+}
