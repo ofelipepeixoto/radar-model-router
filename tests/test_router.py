@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 import subprocess
 import sys
@@ -133,9 +134,10 @@ class Budget(unittest.TestCase):
         with self.ledger.connect() as db:self.assertEqual(db.execute('SELECT actual FROM reservations').fetchone()[0],150)
     def test_tenant_budget_isolation(self):self.reserve('one',100,tenant='a');self.reserve('one',100,tenant='b')
     def test_no_auto_expiration(self):
-        self.reserve('one',100)
-        with patch('radar_router.ledger.time.time',return_value=10**10):
-            with self.assertRaises(LedgerError):self.reserve('two',1)
+        with patch('radar_router.ledger.time.gmtime',return_value=time.strptime('2026-10-10','%Y-%m-%d')):
+            self.reserve('one',100)
+        with patch('radar_router.ledger.time.gmtime',return_value=time.strptime('2026-11-10','%Y-%m-%d')):
+            with self.assertRaisesRegex(LedgerError,'^budget_exceeded$'):self.reserve('two',1)
     def test_invalid_amounts(self):
         for value in [-1,True,0]:
             with self.subTest(value=value),self.assertRaises(ContractError):self.reserve('op',value)
