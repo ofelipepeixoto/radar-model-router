@@ -103,7 +103,14 @@ class Ledger:
                 old = db.execute("SELECT maximum,state FROM reservations WHERE identity=?", (identity,)).fetchone()
                 if old:
                     raise LedgerError("duplicate_reservation")
-                used = db.execute("SELECT COALESCE(SUM(CASE WHEN state='settled' THEN actual ELSE maximum END),0) FROM reservations WHERE tenant=? AND day=?", (owner, day)).fetchone()[0]
+                # Unresolved exposure survives UTC rollover until explicit reconciliation.
+                # Settled actuals remain charged to the reservation's original UTC day.
+                used = db.execute(
+                    "SELECT COALESCE(SUM(CASE WHEN state='settled' THEN actual ELSE maximum END),0) "
+                    "FROM reservations WHERE tenant=? AND "
+                    "(state IN ('reserved','unknown') OR (state='settled' AND day=?))",
+                    (owner, day),
+                ).fetchone()[0]
                 if used+maximum_micro > daily_limit_micro:
                     raise LedgerError("budget_exceeded")
                 db.execute("INSERT INTO reservations VALUES(?,?,?,?,NULL,'reserved')", (identity,owner,day,maximum_micro))
