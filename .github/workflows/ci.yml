@@ -23,6 +23,9 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Tests
         run: python -m unittest discover -s tests -v
+      - name: FT05 offline contracts
+        working-directory: experiments/ft05
+        run: python -m unittest discover -s tests -v
       - name: Synthetic evals
         run: python -m radar_router.evaluate
       - name: Laya contract study (synthetic fixtures only)

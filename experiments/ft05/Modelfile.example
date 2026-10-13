@@ -1,0 +1,4 @@
+# Replace only after a real export. Preserve and compare Qwen chat template/EOS.
+FROM ./model-q4_k_m.gguf
+PARAMETER temperature 0
+PARAMETER num_predict 96

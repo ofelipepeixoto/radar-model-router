@@ -1,0 +1,2 @@
+{"group_id": "entrega-4", "id": "entrega-4", "messages": [{"content": "Quando chega minha compra ficticia?", "role": "user"}, {"content": "{\"categoria\": \"entrega\", \"urgencia\": \"alta\"}", "role": "assistant"}], "reviewed": false, "synthetic": true}
+{"group_id": "entrega-3", "id": "entrega-3", "messages": [{"content": "O rastreio de exemplo parou", "role": "user"}, {"content": "{\"categoria\": \"entrega\", \"urgencia\": \"alta\"}", "role": "assistant"}], "reviewed": false, "synthetic": true}
