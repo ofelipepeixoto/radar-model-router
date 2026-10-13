@@ -26,6 +26,7 @@ Saída da entrada de exemplo: tier `padrao`, esforço `medium`, modo sombra, API
 - Retenção de decisões de sete dias, com limpeza ao próximo acesso; não há timer autônomo.
 - Ledger experimental de orçamento inteiro em microunidades, reserva atômica, reconciliação e preservação de resultados desconhecidos.
 - Adapter puro para shape de request Hermes, desabilitado por padrão; valida provider, api_mode e capabilities explícitas.
+- Contrato offline de elegibilidade de provider, capacidades e abstenção conservadora; ver [ADR 0002](docs/adr/0002-provider-capabilities.md).
 - Workflow n8n **inativo**, que apenas produz uma entrada sintética para o contrato; não chama Python nem usa credenciais.
 - CI configurado para Python 3.11 e 3.12, testes de contrato e execução do exemplo n8n em Node.
 
