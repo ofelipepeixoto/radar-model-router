@@ -1,0 +1,25 @@
+{
+  "n": 4,
+  "valid_json_rate": 1.0,
+  "exact_match": 0.75,
+  "category_macro_f1_observed": 0.6,
+  "confusion": [
+    {
+      "expected": "cancelamento",
+      "predicted": "cancelamento",
+      "n": 2
+    },
+    {
+      "expected": "cancelamento",
+      "predicted": "outro",
+      "n": 1
+    },
+    {
+      "expected": "entrega",
+      "predicted": "entrega",
+      "n": 1
+    }
+  ],
+  "scope": "synthetic_only",
+  "model_inference_executed": false
+}

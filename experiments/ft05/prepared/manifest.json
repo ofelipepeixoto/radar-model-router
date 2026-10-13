@@ -1,0 +1,19 @@
+{
+  "source_sha256": "ec37617f6e381c8291524f348fbc75992839c398b09d0c82a6bfe8381c358405",
+  "synthetic": true,
+  "training_ready": false,
+  "partitions": {
+    "test": {
+      "count": 4,
+      "sha256": "e0b6d896a0149753c5988250afddadfcc321067b0afb0fb0b23403a1f9c9f514"
+    },
+    "validation": {
+      "count": 2,
+      "sha256": "eddeeb7800938efdc3dad0d706b34151f5a98388e023dbb041a873e7a3836389"
+    },
+    "train": {
+      "count": 18,
+      "sha256": "69b298b5921ab858546c082f51c2da231549c55b9ffb33e69f91c2686df0992c"
+    }
+  }
+}
