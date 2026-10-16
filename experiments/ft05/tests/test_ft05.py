@@ -3,7 +3,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from ft05 import validate, split, evaluate, strict_json, prepare, normalize
+from ft05 import validate, split, evaluate, strict_json, prepare, normalize, load_frozen, compare
 from train import run, check_config
 
 
@@ -59,6 +59,8 @@ class Tests(unittest.TestCase):
         score = evaluate(data, predictions)
         self.assertEqual(score['exact_match'], 1 / 3)
         self.assertEqual(score['valid_json_rate'], 2 / 3)
+        self.assertEqual(score['urgency_macro_f1_observed'], 0.25)
+        self.assertEqual(sum(c['n'] for c in score['urgency_confusion']), 3)
         self.assertFalse(score['model_inference_executed'])
         predictions['unexpected'] = '{}'
         with self.assertRaises(ValueError): evaluate(data, predictions)
@@ -66,6 +68,49 @@ class Tests(unittest.TestCase):
     def test_training_gates(self):
         with self.assertRaises(ValueError): validate(rows(), training=True)
         with self.assertRaises(ValueError): check_config({})
+
+    def test_same_holdout_comparison_counts_improvements_and_regressions(self):
+        data = rows()[:3]
+        right = {r['id']: r['messages'][1]['content'] for r in data}
+        original, personalized = right.copy(), right.copy()
+        original['x0'] = 'invalid'
+        personalized['x1'] = 'invalid'
+        report = compare(data, original, personalized)
+        self.assertEqual(report['improved_ids'], ['x0'])
+        self.assertEqual(report['regressed_ids'], ['x1'])
+        self.assertEqual(report['delta_exact_match'], 0)
+        self.assertEqual(report['delta_urgency_macro_f1'], 0)
+        with self.assertRaises(ValueError): compare(data, original, {'x0': '{}'})
+
+    def test_reviewed_freeze_refuses_changed_source_or_partitions(self):
+        data = [{'id': f'x{i}', 'group_id': f'g{i}', 'synthetic': True, 'reviewed': True,
+                 'messages': [{'role': 'user', 'content': f'Pedido ficticio variante {i}'},
+                              {'role': 'assistant', 'content': '{"categoria":"entrega","urgencia":"alta"}'}]}
+                for i in range(200)]
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / 'reviewed.jsonl'
+            source.write_text(''.join(json.dumps(r) + '\n' for r in data))
+            frozen = Path(directory) / 'frozen'
+            self.assertTrue(prepare(source, frozen, training=True)['training_ready'])
+            parts, digest = load_frozen(source, frozen)
+            self.assertEqual(sum(map(len, parts.values())), 200)
+            self.assertEqual(len(digest), 64)
+            test = frozen / 'test.jsonl'
+            original = test.read_bytes()
+            test.write_bytes(original + b'\n')
+            with self.assertRaisesRegex(ValueError, 'frozen_partition_changed'):
+                load_frozen(source, frozen)
+            test.write_bytes(original)
+            source.write_text(source.read_text().replace('variante 0', 'variante zero'))
+            with self.assertRaisesRegex(ValueError, 'source_changed_after_freeze'):
+                load_frozen(source, frozen)
+
+    def test_training_requires_explicit_frozen_split(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / 'input.jsonl'
+            source.write_text(''.join(json.dumps(r) + '\n' for r in rows()))
+            with self.assertRaisesRegex(ValueError, 'frozen_split_required'):
+                run(source, 'nonexistent', Path(directory) / 'output', execute=True)
 
     def test_prepare_and_plan_no_dependencies(self):
         with tempfile.TemporaryDirectory() as directory:

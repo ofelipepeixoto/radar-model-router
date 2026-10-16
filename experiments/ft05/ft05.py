@@ -141,6 +141,7 @@ def evaluate(rows, predictions):
         raise ValueError('prediction_ids_mismatch')
     valid = exact = 0
     confusion = Counter()
+    urgency_confusion = Counter()
     for row in rows:
         expected = target(row['messages'][-1]['content'])
         try:
@@ -148,9 +149,12 @@ def evaluate(rows, predictions):
             valid += 1
             exact += actual == expected
             label = actual['categoria']
+            urgency = actual['urgencia']
         except (ValueError, TypeError):
             label = 'INVALID'
+            urgency = 'INVALID'
         confusion[(expected['categoria'], label)] += 1
+        urgency_confusion[(expected['urgencia'], urgency)] += 1
     f1 = []
     for label in sorted(CATEGORIES):
         tp = confusion[label, label]
@@ -158,37 +162,101 @@ def evaluate(rows, predictions):
         fn = sum(n for (a, b), n in confusion.items() if a == label and b != label)
         if tp + fp + fn:
             f1.append(2 * tp / (2 * tp + fp + fn))
+    urgency_f1 = []
+    for label in sorted(URGENCIES):
+        tp = urgency_confusion[label, label]
+        fp = sum(n for (a, b), n in urgency_confusion.items() if b == label and a != label)
+        fn = sum(n for (a, b), n in urgency_confusion.items() if a == label and b != label)
+        if tp + fp + fn:
+            urgency_f1.append(2 * tp / (2 * tp + fp + fn))
     return {'n': len(rows), 'valid_json_rate': valid / len(rows),
             'exact_match': exact / len(rows), 'category_macro_f1_observed': sum(f1) / len(f1),
             'confusion': [{'expected': a, 'predicted': b, 'n': n} for (a, b), n in sorted(confusion.items())],
+            'urgency_macro_f1_observed': sum(urgency_f1) / len(urgency_f1),
+            'urgency_confusion': [{'expected': a, 'predicted': b, 'n': n}
+                                  for (a, b), n in sorted(urgency_confusion.items())],
             'scope': 'synthetic_only', 'model_inference_executed': False}
 
 
-def prepare(source, destination):
-    rows = load(source)
+def prepare(source, destination, training=False):
+    rows = load(source, training=training)
     parts = split(rows)
     destination = Path(destination)
     # Exclusive directory avoids accidentally replacing an earlier experiment.
     destination.mkdir(parents=True, exist_ok=False)
     manifest = {'source_sha256': hashlib.sha256(Path(source).read_bytes()).hexdigest(),
-                'synthetic': True, 'training_ready': False, 'partitions': {}}
+                'synthetic': True, 'training_ready': training, 'partitions': {}}
     for name, items in parts.items():
         content = ''.join(json.dumps(r, ensure_ascii=False, sort_keys=True) + '\n' for r in items)
         path = destination / (name + '.jsonl')
         path.write_text(content, encoding='utf-8')
         manifest['partitions'][name] = {'count': len(items), 'sha256': hashlib.sha256(content.encode()).hexdigest()}
-    predictions = {r['id']: json.dumps(baseline(r['messages'][0]['content'])) for r in parts['test']}
-    (destination / 'baseline.json').write_text(json.dumps(evaluate(parts['test'], predictions), indent=2))
+    if not training:
+        # The reviewed holdout stays unopened until the planned model comparison.
+        predictions = {r['id']: json.dumps(baseline(r['messages'][0]['content'])) for r in parts['test']}
+        (destination / 'baseline.json').write_text(json.dumps(evaluate(parts['test'], predictions), indent=2))
     (destination / 'manifest.json').write_text(json.dumps(manifest, indent=2))
     return manifest
+
+
+def load_frozen(source, directory):
+    """Refuse a changed source, split, or manifest before touching model libraries."""
+    directory = Path(directory)
+    manifest = strict_json((directory / 'manifest.json').read_text(encoding='utf-8'))
+    if (type(manifest) is not dict or manifest.get('training_ready') is not True
+            or manifest.get('synthetic') is not True
+            or set(manifest.get('partitions', {})) != {'train', 'validation', 'test'}):
+        raise ValueError('frozen_split_not_training_ready')
+    raw = Path(source).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != manifest.get('source_sha256'):
+        raise ValueError('source_changed_after_freeze')
+    rows = load(source, training=True)
+    expected = split(rows)
+    parts = {}
+    for name in ('train', 'validation', 'test'):
+        payload = (directory / (name + '.jsonl')).read_bytes()
+        record = manifest['partitions'][name]
+        if (type(record) is not dict or record.get('count') != len(expected[name])
+                or record.get('sha256') != hashlib.sha256(payload).hexdigest()):
+            raise ValueError('frozen_partition_changed')
+        parts[name] = load(directory / (name + '.jsonl'))
+        if parts[name] != expected[name]:
+            raise ValueError('frozen_partition_mismatch')
+    return parts, hashlib.sha256((directory / 'manifest.json').read_bytes()).hexdigest()
+
+
+def compare(rows, original, personalized):
+    """Pair predictions by ID on one holdout; invalid JSON counts as an error."""
+    first, second = evaluate(rows, original), evaluate(rows, personalized)
+    cases = []
+    for row in rows:
+        expected = target(row['messages'][-1]['content'])
+        correct = []
+        for predictions in (original, personalized):
+            try:
+                correct.append(target(predictions[row['id']]) == expected)
+            except (ValueError, TypeError):
+                correct.append(False)
+        cases.append({'id': row['id'], 'original_correct': correct[0],
+                      'personalized_correct': correct[1]})
+    return {'n': len(rows), 'original': first, 'personalized': second,
+            'delta_exact_match': second['exact_match'] - first['exact_match'],
+            'delta_category_macro_f1': second['category_macro_f1_observed'] - first['category_macro_f1_observed'],
+            'delta_urgency_macro_f1': second['urgency_macro_f1_observed'] - first['urgency_macro_f1_observed'],
+            'delta_valid_json_rate': second['valid_json_rate'] - first['valid_json_rate'],
+            'improved_ids': [c['id'] for c in cases if not c['original_correct'] and c['personalized_correct']],
+            'regressed_ids': [c['id'] for c in cases if c['original_correct'] and not c['personalized_correct']],
+            'per_case': cases, 'scope': 'synthetic_only'}
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('dataset')
     parser.add_argument('output')
+    parser.add_argument('--training-reviewed', action='store_true',
+                        help='Only for 200-500 independently reviewed synthetic rows')
     args = parser.parse_args()
     try:
-        print(json.dumps(prepare(args.dataset, args.output), indent=2))
+        print(json.dumps(prepare(args.dataset, args.output, training=args.training_reviewed), indent=2))
     except (ValueError, OSError, UnicodeError):
         parser.exit(2, 'ft05_input_or_output_rejected\n')
