@@ -6,7 +6,7 @@ Adição isolada em `experiments/ft05/`, baseada na main
 arquivos de capabilities/provider são independentes deste experimento e não
 foram copiados ou alterados. Mantém trabalhos posteriores da main.
 
-Validação local: 91 testes existentes do router e 8 testes deste experimento
+Na entrega original, 91 testes existentes do router e 8 testes deste experimento
 passaram em Python 3.12.14. Contrato Node → Python existente também passou.
 Treino GPU, inferência de modelo, GGUF/Ollama/llama.cpp permanecem não executados.
 
@@ -43,25 +43,66 @@ O scanner de padrões de e-mail/números/segredos é heurístico, **não anonimi
 Neste escopo só dados sintéticos são permitidos. `synthetic` é declaração do
 operador, não prova técnica de origem.
 
+## Colab Pro: fluxo reproduzível e teste congelado
+
+Abra [`FT05.ipynb`](FT05.ipynb) no Colab com a conta Pro e informe o SHA da PR
+empilhada `feat/ft05-colab-pro`. O repositório público pode ser clonado sem
+entrar com a mesma conta do GitHub. O notebook não instala dependências, monta
+Drive ou inicia GPU por padrão. Inspecione código, confirme GPU e saldo pela UI,
+defina uma pasta exclusiva do FT05 no Drive e use apenas corpus sintético
+revisado. O teste de 24 exemplos não pode ser promovido por flag. Não monte
+Drive nem habilite execução de células de rede em um notebook desconhecido.
+
+Para reproduzir a separação fora do Colab, com 200–500 linhas efetivamente
+revisadas e grupos curados:
+
+```sh
+python3 ft05.py dataset-reviewed.jsonl /caminho/persistente/frozen --training-reviewed
+python3 train.py dataset-reviewed.jsonl --train --frozen /caminho/persistente/frozen \
+  --config /caminho/persistente/run-001-config.json \
+  --output /caminho/persistente/run-001
+```
+
+O primeiro comando grava manifesto, hashes e partições train/validation/test.
+O treino recusa corpus, manifesto ou partição alterados e nunca recalcula
+silenciosamente o teste. O JSON de configuração contém a revisão imutável
+`5fee7c4ed634dc66c6e318c8ac2897b8b9154536` do modelo Qwen; os seis
+pacotes, inclusive dependências do Colab, ainda exigem versão compatível
+verificada em runtime real. O notebook registra o lock do ambiente após uma
+instalação explicitamente habilitada. `reviewed: true` é uma declaração do
+revisor responsável: hashes e testes não comprovam revisão humana ou ausência
+de paráfrases entre partições.
+
+`model-baseline.json` mede o modelo original e `model-finetuned.json` o LoRA
+no mesmo teste; `predictions-model-*.json` guarda as saídas, e
+`comparison.json` emparelha IDs com melhorias/regressões e deltas de acerto
+exato, F1 por categoria e urgência e JSON válido. `run.json` grava hashes do corpus, split, configuração e template, modelo
+e pacotes. Ausência de `run.json` indica execução incompleta. Checkpoints de
+época são gravados no diretório escolhido: no Colab, use Drive exclusivo para
+persistência, aceitando a lentidão possível. O teste não serve para seleção de
+hiperparâmetros; class distributions e decisões de rótulo precisam de revisão
+antes do primeiro treino. Colab Pro pode consumir unidades e não garante GPU
+ou duração. Não há conexão com outros projetos, Supabase ou API paga nesta etapa.
+
 ## Treino e exportação preparados, não executados
 
-`FT05.ipynb` é um notebook Jupyter/Colab sintaticamente validado, sem instalação
+`FT05.ipynb` é um notebook Jupyter/Colab sem instalação
 automática. A compatibilidade com GPU/T4/Unsloth não foi demonstrada. O script
 não importa bibliotecas GPU no modo padrão. Para homologação futura:
 
 1. Revise 200–500 exemplos sintéticos e os grupos; preserve teste congelado.
 2. Confirme capacidade, orçamento e disponibilidade de GPU. T4/Colab não é
    garantido nem ilimitado; energia, armazenamento e servidor têm custo.
-3. Fixe revisão SHA do Qwen e versões exatas das seis bibliotecas no JSON,
-   em ambiente descartável; resolva e retenha lockfile/transitivas. Os campos
-   vazios são bloqueios deliberados, não versões inventadas.
+3. A revisão SHA do Qwen está fixada; escolha versões exatas compatíveis das
+   seis bibliotecas em ambiente descartável e retenha lockfile/transitivas. Os
+   campos de pacote vazios são bloqueios deliberados, não versões inventadas.
 4. Revise dependências e marque gates somente após essa revisão. O script não
    instala pacotes, provisiona credenciais ou faz upload de dados.
-5. `python3 train.py dataset-reviewed.jsonl --train --config training-config.json`
+5. `python3 train.py dataset-reviewed.jsonl --train --frozen frozen --config training-config.json`
    é a etapa explícita futura. Faz baseline do modelo em teste antes de LoRA,
    treina só em treino, calcula loss em validação e compara o mesmo teste após.
    Não usar teste para escolher hiperparâmetros. Reporta JSON válido, exact match,
-   macro-F1 sobre classes observadas e matriz de confusão.
+   macro-F1 de categoria/urgência sobre classes observadas, matrizes de confusão e erros por ID.
 6. `gguf_export_approved` é separado: exportação Unsloth pode baixar/compilar
    llama.cpp. Auditar essa cadeia antes de habilitar. Nenhum GGUF existe aqui.
 7. Depois de exportar, revisar `Modelfile.example`, hash e template/EOS. Importação

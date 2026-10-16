@@ -1,6 +1,6 @@
 {
   "model": "Qwen/Qwen2.5-1.5B-Instruct",
-  "model_revision": null,
+  "model_revision": "5fee7c4ed634dc66c6e318c8ac2897b8b9154536",
   "synthetic_only": true,
   "gpu_budget_approved": false,
   "dependency_reviewed": false,
