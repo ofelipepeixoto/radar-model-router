@@ -4,6 +4,9 @@
 São 18 por combinação de quatro categorias e três urgências. A distribuição foi
 balanceada deliberadamente para avaliação de contrato; **não representa** o
 volume ou a frequência de um atendimento real. Nenhum dado de cliente foi usado.
+Os pedidos foram redigidos como mensagens plausíveis, sem inserir “fictício”,
+“simulado” ou “de teste” no texto que o modelo receberia; a origem sintética
+fica registrada no campo `synthetic`.
 Não mesclar com a fixture de 24 casos nem com os nove cenários ambíguos da
 `REVIEW-SHEET.md`. O corpus candidato não pode ativar treino: todos os registros
 permanecem `reviewed: false`.
@@ -34,6 +37,12 @@ promover, o revisor precisa aceitar a política ou ajustar e versioná-la.
 - 216 IDs únicos, 216 textos normalizados únicos, 212 grupos propostos.
 - Quatro pares de paráfrases intencionais compartilham grupo: IDs `01` e `02`
   em `entrega/alta`, `pagamento/alta`, `cancelamento/alta` e `outro/alta`.
+- Outros temas podem merecer **grupos maiores** após leitura humana: cobrança
+  duplicada em `pagamento/alta-01,02,05,13`; renovação iminente em
+  `cancelamento/alta-01,02,06,11,14,17`; acesso suspeito em
+  `outro/alta-01,02,05,12,14`; exposição entre perfis em
+  `outro/alta-03,11,17`. Estes IDs são pistas de revisão, não grupos já
+  aprovados. Agrupá-los pode mudar a composição do teste congelável.
 - Nenhum texto normalizado coincide com a fixture de 24 ou os nove cenários.
 - Nenhum par em grupos diferentes atingiu similaridade textual ≥ 0,77 pelo
   `SequenceMatcher`. Essa heurística **não detecta equivalência semântica**.
@@ -41,7 +50,9 @@ promover, o revisor precisa aceitar a política ou ajustar e versioná-la.
   validação e 42 teste. As 12 combinações de categoria/urgência aparecem no
   teste após curadoria do ID do caso de expedição **antes de qualquer treino**.
   O split pode mudar se o revisor excluir casos ou alterar grupos; faça uma
-  última inspeção de distribuição antes de congelá-lo.
+  última inspeção de distribuição antes de congelá-lo. `entrega/alta` tem só
+  um caso no teste preliminar, o que impede uma conclusão estável por essa
+  combinação.
 - Pontos de decisão especialmente úteis: reembolso em
   `c26-cancelamento-baixa-08` (cancelamento versus pagamento); segurança de
   conta em `c26-outro-alta-*` (categoria residual com urgência alta); a

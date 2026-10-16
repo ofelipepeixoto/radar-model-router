@@ -33,6 +33,11 @@ class CandidateReviewTests(unittest.TestCase):
         self.assertFalse(report['training_ready'])
         self.assertEqual(set(report['labels'].values()), {18})
         self.assertEqual(report['unique_normalized_prompts'], 216)
+        for row in rows:
+            prompt = normalize(row['messages'][0]['content'])
+            self.assertNotIn('fictíci', prompt)
+            self.assertNotIn('simulad', prompt)
+            self.assertNotIn('de teste', prompt)
         original = load(SOURCE.parent / 'synthetic.jsonl') + scenarios()
         self.assertFalse({normalize(r['messages'][0]['content']) for r in rows}
                          & {normalize(r['messages'][0]['content']) for r in original})
