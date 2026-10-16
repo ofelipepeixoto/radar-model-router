@@ -178,14 +178,27 @@ def evaluate(rows, predictions):
             'scope': 'synthetic_only', 'model_inference_executed': False}
 
 
-def prepare(source, destination, training=False):
+def prepare(source, destination, training=False, automated=False):
+    if training and automated:
+        raise ValueError('choose_one_review_mode')
     rows = load(source, training=training)
-    parts = split(rows)
+    if automated:
+        from auto_pilot import POLICY, SOURCE_SHA256, split_auto, verify_auto
+        verify_auto(rows)
+        parts = split_auto(rows)
+    else:
+        parts = split(rows)
     destination = Path(destination)
     # Exclusive directory avoids accidentally replacing an earlier experiment.
     destination.mkdir(parents=True, exist_ok=False)
     manifest = {'source_sha256': hashlib.sha256(Path(source).read_bytes()).hexdigest(),
-                'synthetic': True, 'training_ready': training, 'partitions': {}}
+                'synthetic': True, 'training_ready': training or automated,
+                'review_mode': ('synthetic_machine_checked' if automated else
+                                'human_declared' if training else 'fixture_only'),
+                'human_reviewed': training,
+                'partitions': {}}
+    if automated:
+        manifest.update(policy=POLICY, candidate_source_sha256=SOURCE_SHA256)
     for name, items in parts.items():
         content = ''.join(json.dumps(r, ensure_ascii=False, sort_keys=True) + '\n' for r in items)
         path = destination / (name + '.jsonl')
@@ -210,8 +223,17 @@ def load_frozen(source, directory):
     raw = Path(source).read_bytes()
     if hashlib.sha256(raw).hexdigest() != manifest.get('source_sha256'):
         raise ValueError('source_changed_after_freeze')
-    rows = load(source, training=True)
-    expected = split(rows)
+    if manifest.get('review_mode') == 'synthetic_machine_checked':
+        from auto_pilot import POLICY, SOURCE_SHA256, split_auto, verify_auto
+        if (manifest.get('human_reviewed') is not False or manifest.get('policy') != POLICY
+                or manifest.get('candidate_source_sha256') != SOURCE_SHA256):
+            raise ValueError('automated_provenance_changed')
+        rows = load(source)
+        verify_auto(rows)
+        expected = split_auto(rows)
+    else:
+        rows = load(source, training=True)
+        expected = split(rows)
     parts = {}
     for name in ('train', 'validation', 'test'):
         payload = (directory / (name + '.jsonl')).read_bytes()
@@ -255,8 +277,11 @@ if __name__ == '__main__':
     parser.add_argument('output')
     parser.add_argument('--training-reviewed', action='store_true',
                         help='Only for 200-500 independently reviewed synthetic rows')
+    parser.add_argument('--synthetic-auto', action='store_true',
+                        help='Only for the pinned, machine-checked synthetic FT05 pilot')
     args = parser.parse_args()
     try:
-        print(json.dumps(prepare(args.dataset, args.output, training=args.training_reviewed), indent=2))
+        print(json.dumps(prepare(args.dataset, args.output, training=args.training_reviewed,
+                                 automated=args.synthetic_auto), indent=2))
     except (ValueError, OSError, UnicodeError):
         parser.exit(2, 'ft05_input_or_output_rejected\n')

@@ -52,7 +52,39 @@ grupos, auditoria técnica e a ficha CSV de decisão por caso. O utilitário
 com decisões completas e ao menos 200 casos aprovados. A revisão humana
 efetiva não é inferível dos campos preenchidos. A cópia editada da planilha
 fica privada, fora deste repositório público. O notebook Colab existente
-continua com treino desativado até a promoção e o congelamento do teste.
+contém também um piloto automático separado, descrito abaixo. A revisão humana
+continua necessária para qualquer reivindicação de qualidade operacional.
+
+## Piloto sem planilha: corpus sintético com checagem automática
+
+Para experimentar o treino e a comparação no Colab Pro sem editar 216 linhas,
+use a branch `feat/ft05-automated-synthetic` e o notebook atualizado. O script
+`auto_pilot.py` fixa o SHA exato dos 216 candidatos, exclui oito pedidos
+ambíguos com motivos em código, agrupa famílias semânticas conhecidas e produz
+208 registros sintéticos com `reviewed: false`. Valida IDs, esquema, rótulos,
+unicidade, grupos, tamanho e cobertura de todas as 12 combinações de rótulos
+em treino, validação e teste. A partição é feita por grupo e gravada com hashes.
+
+Teste local, sem Drive, rede, GPU ou instalação:
+
+```sh
+python3 -c "from auto_pilot import write_auto_dataset; print(write_auto_dataset('/tmp/ft05-synthetic-auto.jsonl'))"
+python3 ft05.py /tmp/ft05-synthetic-auto.jsonl /tmp/ft05-auto-frozen --synthetic-auto
+python3 train.py /tmp/ft05-synthetic-auto.jsonl
+```
+
+Escolha destinos inexistentes; se um arquivo já existir, o gerador só o aceita
+quando os bytes conferirem exatamente. A execução no Colab usa uma pasta
+exclusiva no Drive e grava `auto-audit.json`, dataset, manifesto e as três
+partições. O manifesto registra `review_mode: synthetic_machine_checked` e
+`human_reviewed: false`. O caminho de 200–500 casos efetivamente revisados
+continua separado (`--training-reviewed`). Flags de instalação e treino seguem
+desligadas; ativá-las exige observar GPU/saldo e verificar versões compatíveis
+dos pacotes no runtime Pro. O piloto automático é uma **demonstração técnica**.
+As mensagens foram escritas e rotuladas sinteticamente na mesma origem; esta
+checagem não estabelece verdade independente nem representatividade, e alguns
+parafraseamentos sem grupo podem permanecer. Métricas do holdout sintético não
+autorizam uso com clientes, ativação no roteador ou publicação de um modelo.
 
 ## Colab Pro: fluxo reproduzível e teste congelado
 

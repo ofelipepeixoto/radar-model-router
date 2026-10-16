@@ -115,6 +115,8 @@ def run(dataset, config_path, output, execute=False, frozen_dir=None):
     manifest = {'model': MODEL, 'revision': config['model_revision'], 'versions': versions,
         'dataset_sha256': hashlib.sha256(Path(dataset).read_bytes()).hexdigest(),
         'frozen_manifest_sha256': frozen_sha256,
+        'review_mode': strict_json((Path(frozen_dir) / 'manifest.json').read_text())['review_mode'],
+        'human_reviewed': strict_json((Path(frozen_dir) / 'manifest.json').read_text())['human_reviewed'],
         'config_sha256': hashlib.sha256(Path(config_path).read_bytes()).hexdigest(),
         'test_ids': [r['id'] for r in parts['test']],
         'chat_template_sha256': hashlib.sha256(tokenizer.chat_template.encode()).hexdigest(),
