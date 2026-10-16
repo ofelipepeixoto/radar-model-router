@@ -43,6 +43,17 @@ O scanner de padrões de e-mail/números/segredos é heurístico, **não anonimi
 Neste escopo só dados sintéticos são permitidos. `synthetic` é declaração do
 operador, não prova técnica de origem.
 
+## Corpus candidato para revisão
+
+[`CANDIDATE-REVIEW.md`](CANDIDATE-REVIEW.md) documenta 216 exemplos
+sintéticos **não revisados**, a política proposta para categoria/urgência,
+grupos, auditoria técnica e a ficha CSV de decisão por caso. O utilitário
+`review_candidates.py` gera a planilha e só promove para um JSONL treinável
+com decisões completas e ao menos 200 casos aprovados. A revisão humana
+efetiva não é inferível dos campos preenchidos. A cópia editada da planilha
+fica privada, fora deste repositório público. O notebook Colab existente
+continua com treino desativado até a promoção e o congelamento do teste.
+
 ## Colab Pro: fluxo reproduzível e teste congelado
 
 Abra [`FT05.ipynb`](FT05.ipynb) no Colab com a conta Pro e informe o SHA da PR
