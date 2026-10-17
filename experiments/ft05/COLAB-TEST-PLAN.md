@@ -8,6 +8,10 @@ O projeto também será compartilhável: outras pessoas poderão criar o
 **próprio** piloto com o corpus sintético público e o **próprio** Drive.
 O adaptador run-002-g4 e os caminhos privados do operador servem apenas
 à sua verificação pessoal; não são dependência do tutorial público.
+Nesta primeira versão, cada pessoa reproduz o mesmo classificador de
+quatro categorias e três urgências. Mudar domínio, classes ou modelo base
+exige adaptar a política, o esquema, os dados e os testes; não anunciar
+isso como uma opção pronta no notebook inicial.
 
 ## Estado conhecido em 16/10/2026 (São Paulo)
 
