@@ -4,6 +4,11 @@
 do adaptador salvo ocorrerá na GPU do Colab Pro. Não será usada a GPU local,
 WSL ou instalação de Unsloth no PC.
 
+O projeto também será compartilhável: outras pessoas poderão criar o
+**próprio** piloto com o corpus sintético público e o **próprio** Drive.
+O adaptador run-002-g4 e os caminhos privados do operador servem apenas
+à sua verificação pessoal; não são dependência do tutorial público.
+
 ## Estado conhecido em 16/10/2026 (São Paulo)
 
 - A PR #7 contém o piloto sintético. A PR #8 acrescenta o protocolo de
@@ -27,10 +32,34 @@ WSL ou instalação de Unsloth no PC.
 | Artefatos | Corpus, split, run.json e adaptador íntegros no Drive | Verificar novamente |
 | Teste pessoal | Mensagens novas digitadas no navegador, modelo carregado, respostas e latência salvas | Implementar e executar |
 | Avaliação independente | Fonte real permitida, duas revisões cegas, adjudicação e relatório | Pendente de dados e pessoas |
+| Tutorial público | Notebook guiado executável por outra conta, sem artefatos privados, com saídas e limites claros | A implementar e homologar |
 
 Os primeiros três marcos mostram funcionamento técnico no Colab. O quarto
 avalia qualidade no contexto real. Nenhum marco autoriza o atendimento
 automático a clientes.
+
+## Dois percursos para quem usar o projeto
+
+| Percurso | O que a pessoa precisa | O que entrega |
+| --- | --- | --- |
+| Experimentar | Conta Google, notebook público e Python; GPU somente para inferência/treino | Testes, corpus sintético, adaptador próprio se optar por treinar, mensagens de teste |
+| Avaliar meu caso | Além disso, fonte real anonimizada autorizada e revisores distintos | Relatório privado de qualidade do próprio contexto |
+
+O tutorial terá um botão Abrir no Colab, introdução curta e células numeradas:
+0. Verificar ambiente; 1. Preparar fixture pública e rodar testes sem GPU;
+2. Escolher uma pasta exclusiva no Drive; 3. Validar GPU e dependências;
+4. Treinar adaptador próprio **por escolha explícita**; 5. Testar mensagens
+novas; 6. Avaliação independente opcional. Por padrão, nenhuma célula monta
+Drive, instala pacotes ou treina sem ação consciente. Cada etapa mostra
+resultado esperado, erro legível e como retomar numa pasta nova.
+
+Não exigir que iniciantes preencham SHA, caminhos internos e versões de
+pacotes à mão; o notebook deve registrar automaticamente o commit efetivo
+e validar as versões antes de uma etapa GPU. Para uma edição estável,
+publicar um tag/release revisado e apontar o botão Colab para essa revisão,
+não para uma branch móvel. O fluxo pode ser usado em Colab compatível
+sem prometer GPU específica, unidades gratuitas ou desempenho igual ao
+da conta Pro.
 
 ## Fase 1 — sessão Colab limpa
 
@@ -156,4 +185,8 @@ ensaio de avaliação.
 
 **Próxima ação:** implementar a seção da fase 3 na PR #8 e revisar o
 pré-voo da fase 2. O operador executa fases 1–3 no Colab Pro pelo PC.
-A fase 4 espera fonte permitida e revisores independentes.
+Depois, entregar em PR separada o notebook público guiado, testes de
+integridade e quickstart. Homologar o tutorial em conta/Drive separados,
+com corpus público e adaptador gerado pelo próprio tutorial, antes de
+criar um tag e compartilhar. A fase 4 espera fonte permitida e revisores
+independentes.
