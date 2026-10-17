@@ -235,6 +235,12 @@ executar novamente essa célula e então a etapa 4. Não reutilizar a pasta
 personal-smoke-001. Confirmar JSON e os dois arquivos no Drive. O teste pessoal adicional de uma mensagem foi relatado com JSON válido.
 Repetições opcionais devem usar uma pasta nova e continuar sem treino.
 
+Para testar várias frases na mesma sessão sem recarregar o modelo a cada
+execução, o notebook pessoal inclui uma interface opcional com caixa de texto
+e botão Classificar. Ative `LAUNCH_INTERFACE=True` na própria célula somente
+após o pré-voo. A interface não grava histórico nem cria um link público;
+o processamento continua no runtime do Colab e encerra ao desconectá-lo.
+
 **Publicação para terceiros (depois):** a PR #9 contém o notebook público,
 testes e quickstart. Homologar em conta/Drive separados, com corpus público
 e adaptador gerado pelo tutorial, antes de criar tag e compartilhar como
