@@ -13,11 +13,16 @@ class PersonalUiNotebookTest(unittest.TestCase):
             compile(source, '<personal-colab>', 'exec')
         ui, = [source for source in cells if 'LAUNCH_INTERFACE = False' in source]
         self.assertIn('if LAUNCH_INTERFACE:', ui)
-        self.assertIn('preflight(RUN_DIR, CORPUS, FROZEN, versions=True)', ui)
-        self.assertIn('botao.on_click(classificar)', ui)
-        self.assertIn('torch.inference_mode()', ui)
+        self.assertIn('launch(RUN_DIR, CORPUS, FROZEN)', ui)
+        module = (Path(__file__).resolve().parents[1] / 'personal_ui.py').read_text()
+        compile(module, '<personal-ui>', 'exec')
+        self.assertIn('button.on_click(classify)', module)
+        self.assertIn('torch.inference_mode()', module)
+        self.assertIn('preflight(run_dir, corpus, frozen, versions=True)', module)
         self.assertNotIn('share=True', ui)
         self.assertNotIn('save_pretrained', ui)
+        self.assertNotIn('share=True', module)
+        self.assertNotIn('save_pretrained', module)
 
 
 if __name__ == '__main__':
