@@ -90,6 +90,35 @@ checagem não estabelece verdade independente nem representatividade, e alguns
 parafraseamentos sem grupo podem permanecer. Métricas do holdout sintético não
 autorizam uso com clientes, ativação no roteador ou publicação de um modelo.
 
+## Diagnóstico posterior do adaptador salvo
+
+`posthoc-stress-v1.jsonl` contém 24 mensagens sintéticas novas, duas por cada
+combinação de categoria e urgência. Foi escrito **depois** de observar dois
+erros de urgência do teste congelado; portanto é um diagnóstico direcionado,
+não uma avaliação cega ou revisão humana. Não foi usado para treino e seus
+resultados não substituem o holdout nem sustentam uma estimativa de desempenho
+real. Os textos não coincidem com os 216 candidatos originais; uma checagem
+textual também recusa similaridade ≥ 0,77, mas não prova independência semântica.
+
+Com o ambiente do Colab já instalado, GPU disponível e `run-002-g4` íntegro,
+use um diretório **novo** no mesmo Drive. Esta etapa carrega a base no SHA da
+execução, aplica o adaptador com PEFT, faz somente inferência e grava três
+arquivos: `predictions.json`, `report.json`, `manifest.json`. Não modifica o
+corpus, o teste congelado, o adaptador ou o Supabase.
+
+```sh
+python3 experiments/ft05/evaluate_saved_adapter.py \
+  /content/drive/MyDrive/FT05/piloto-auto-001/run-002-g4 \
+  /content/drive/MyDrive/FT05/piloto-auto-001/posthoc-stress-001 \
+  --corpus /content/drive/MyDrive/FT05/piloto-auto-001/synthetic-machine-checked.jsonl \
+  --frozen /content/drive/MyDrive/FT05/piloto-auto-001/frozen
+```
+
+O avaliador recusa uma execução de treino incompatível, mudanças no corpus e
+split, troca de pacotes e sobrescrita da saída. Registra hashes do adaptador,
+casos diagnósticos e manifesto anterior. A carga PEFT do adaptador salvo deve
+ser validada no Colab real; testes locais cobrem somente dados e relatório.
+
 ## Colab Pro: fluxo reproduzível e teste congelado
 
 Abra [`FT05.ipynb`](FT05.ipynb) no Colab com a conta Pro e informe o SHA da PR
