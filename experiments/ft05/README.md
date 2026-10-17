@@ -97,6 +97,9 @@ revisão cega independente e selo anterior à inferência estão em
 [`INDEPENDENT-EVAL.md`](INDEPENDENT-EVAL.md). O fluxo privado
 `independent_eval.py` depende de mensagens reais anonimizadas e de revisores
 independentes; não converte os 216 candidatos sintéticos em dados revisados.
+O caminho para o teste pessoal no navegador e o desenho do tutorial para outras
+pessoas criarem seus próprios modelos no Colab estão em
+[`COLAB-TEST-PLAN.md`](COLAB-TEST-PLAN.md).
 
 `posthoc-stress-v1.jsonl` contém 24 mensagens sintéticas novas, duas por cada
 combinação de categoria e urgência. Foi escrito **depois** de observar dois
