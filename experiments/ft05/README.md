@@ -104,6 +104,12 @@ O [notebook de teste pessoal](FT05-PERSONAL-COLAB.ipynb) carrega o adaptador
 salvo no Drive privado e faz apenas inferência em mensagens fictícias novas;
 todas as ações externas começam desligadas.
 
+Para criar um adaptador separado na sua conta, leia o
+[guia público](PUBLIC-COLAB-QUICKSTART.md) e use o
+[notebook público](FT05-PUBLIC-COLAB.ipynb). Ele parte somente do corpus
+sintético público e grava no seu próprio Drive. A execução completa por uma
+segunda conta ainda não foi homologada; o notebook está numa PR de rascunho.
+
 `posthoc-stress-v1.jsonl` contém 24 mensagens sintéticas novas, duas por cada
 combinação de categoria e urgência. Foi escrito **depois** de observar dois
 erros de urgência do teste congelado; portanto é um diagnóstico direcionado,
