@@ -201,6 +201,7 @@ def score(directory, sealed_dir, predictions_path, output):
     if (prediction_manifest.get('scope') != 'independent_private_evaluation'
             or prediction_manifest.get('sample_sha256') != review['sample_sha256']
             or prediction_manifest.get('gold_sha256') != review['gold_sha256']
+            or prediction_manifest.get('predictions_sha256') != sha256(predictions_path)
             or prediction_manifest.get('model_inference_executed') is not True
             or prediction_manifest.get('training_performed') is not False):
         raise ValueError('incompatible_prediction_manifest')
@@ -303,6 +304,7 @@ def predict(directory, sealed_dir, run_dir, output, corpus, frozen):
     write_json(output / 'predictions.json', predictions)
     write_json(output / 'manifest.json', {'scope': 'independent_private_evaluation',
                'sample_sha256': review['sample_sha256'], 'gold_sha256': review['gold_sha256'],
+               'predictions_sha256': sha256(output / 'predictions.json'),
                'run_sha256': sha256(run_manifest), 'adapter_config_sha256': sha256(config),
                'adapter_weights_sha256': sha256(weights), 'corpus_sha256': sha256(corpus),
                'frozen_manifest_sha256': frozen_hash, 'model': loaded_name,
