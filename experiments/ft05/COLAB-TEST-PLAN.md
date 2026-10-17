@@ -55,6 +55,19 @@ carregamento inicial e as seguintes cerca de 0,17–0,22 s, conforme a
 saída compartilhada. O aviso de max_new_tokens/max_length não impediu
 as oito saídas válidas. O piloto segue sem validação para atendimento real.
 
+## Teste pessoal adicional relatado em 17/10/2026
+
+Após reiniciar o runtime, o operador restaurou o clone no commit
+ee555f9122ca72b5bacbba086ba09eda98898470, remontou o Drive e
+reinstalou as versões registradas. O pré-voo confirmou os mesmos hashes de
+corpus e split. Uma mensagem fictícia própria (`meu-teste-01`) foi enviada
+pelo navegador do PC à GPU do Colab; o modelo respondeu com JSON válido
+`{"categoria":"cancelamento","urgencia":"media"}` em cerca de 6,35 s.
+O operador relatou os dois arquivos privados em `personal-smoke-002`.
+A entrada exata e o conteúdo desses arquivos não foram lidos diretamente
+por este repositório. Esta é uma verificação funcional individual sem
+rótulo independente, portanto não estabelece acurácia nem prontidão real.
+
 ## Critérios de aceite
 
 | Marco | Evidência esperada | Situação |
@@ -219,8 +232,8 @@ ensaio de avaliação.
 notebook pessoal, aberta no navegador do PC, com a inferência na GPU do Colab.
 Na Configuração, usar `MESSAGES` novos e uma pasta `OUTPUT_DIR` inexistente,
 executar novamente essa célula e então a etapa 4. Não reutilizar a pasta
-personal-smoke-001. Confirmar JSON e os dois arquivos no Drive. O teste
-anterior de oito mensagens não substitui essa experimentação pessoal.
+personal-smoke-001. Confirmar JSON e os dois arquivos no Drive. O teste pessoal adicional de uma mensagem foi relatado com JSON válido.
+Repetições opcionais devem usar uma pasta nova e continuar sem treino.
 
 **Publicação para terceiros (depois):** a PR #9 contém o notebook público,
 testes e quickstart. Homologar em conta/Drive separados, com corpus público
