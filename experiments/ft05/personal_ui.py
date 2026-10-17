@@ -9,9 +9,9 @@ import time
 
 def launch(run_dir, corpus, frozen):
     """Load the pinned adapter once, then return a browser widget in Colab."""
-    from personal_smoke import preflight
+    from personal_smoke import REVISION, preflight
     from ft05 import target
-    from train import REVISION, load_pinned_model
+    from train import load_pinned_model
 
     checked = preflight(run_dir, corpus, frozen, versions=True)
     # Unsloth must be imported before Torch/Transformers in this runtime.
