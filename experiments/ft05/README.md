@@ -81,6 +81,10 @@ partições. O manifesto registra `review_mode: synthetic_machine_checked` e
 continua separado (`--training-reviewed`). Flags de instalação e treino seguem
 desligadas; ativá-las exige observar GPU/saldo e verificar versões compatíveis
 dos pacotes no runtime Pro. O piloto automático é uma **demonstração técnica**.
+O carregador exige `use_exact_model_name=True` e confirma a origem observada:
+sem essa opção, a Unsloth 2026.10.6 substituiu `Qwen/Qwen2.5-1.5B-Instruct`
+por um espelho quantizado e ignorou o SHA fixado. Uma execução anterior a essa
+correção é exploratória e não reproduz o modelo no commit da configuração.
 As mensagens foram escritas e rotuladas sinteticamente na mesma origem; esta
 checagem não estabelece verdade independente nem representatividade, e alguns
 parafraseamentos sem grupo podem permanecer. Métricas do holdout sintético não

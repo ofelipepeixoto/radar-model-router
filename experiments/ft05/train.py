@@ -25,6 +25,18 @@ def check_config(config):
     return versions
 
 
+def load_pinned_model(loader, revision):
+    """Keep Unsloth from substituting its quantized mirror and dropping the SHA."""
+    model, tokenizer = loader.from_pretrained(
+        model_name=MODEL, revision=revision, max_seq_length=2048,
+        load_in_4bit=True, trust_remote_code=False,
+        use_exact_model_name=True)
+    loaded_name = getattr(model.config, '_name_or_path', None)
+    if not isinstance(loaded_name, str) or loaded_name.lower() != MODEL.lower():
+        raise ValueError(f'model_source_changed: {loaded_name!r}')
+    return model, tokenizer, loaded_name
+
+
 def infer(model, tokenizer, rows):
     from unsloth import FastLanguageModel
     import torch
@@ -69,9 +81,8 @@ def run(dataset, config_path, output, execute=False, frozen_dir=None):
     from trl import SFTTrainer, SFTConfig
     if not torch.cuda.is_available():
         raise ValueError('cuda_required')
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=MODEL, revision=config['model_revision'], max_seq_length=2048,
-        load_in_4bit=True, trust_remote_code=False)
+    model, tokenizer, loaded_name = load_pinned_model(
+        FastLanguageModel, config['model_revision'])
     texts = {k: [tokenizer.apply_chat_template(r['messages'], tokenize=False,
                 add_generation_prompt=False) for r in records] for k, records in parts.items()}
     if any(len(tokenizer(t, add_special_tokens=False)['input_ids']) > 2048
@@ -112,7 +123,9 @@ def run(dataset, config_path, output, execute=False, frozen_dir=None):
     # GGUF export may build/download llama.cpp: it is a separate opt-in stage.
     if config.get('gguf_export_approved') is True:
         model.save_pretrained_gguf(str(output / 'gguf'), tokenizer, quantization_method='q4_k_m')
-    manifest = {'model': MODEL, 'revision': config['model_revision'], 'versions': versions,
+    manifest = {'model': MODEL, 'revision': config['model_revision'],
+        'loaded_model_name': loaded_name, 'exact_model_name_required': True,
+        'versions': versions,
         'dataset_sha256': hashlib.sha256(Path(dataset).read_bytes()).hexdigest(),
         'frozen_manifest_sha256': frozen_sha256,
         'review_mode': strict_json((Path(frozen_dir) / 'manifest.json').read_text())['review_mode'],
