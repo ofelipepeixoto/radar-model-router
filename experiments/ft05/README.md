@@ -92,6 +92,12 @@ autorizam uso com clientes, ativação no roteador ou publicação de um modelo.
 
 ## Diagnóstico posterior do adaptador salvo
 
+O padrão de urgência e o protocolo de avaliação com amostragem aleatória,
+revisão cega independente e selo anterior à inferência estão em
+[`INDEPENDENT-EVAL.md`](INDEPENDENT-EVAL.md). O fluxo privado
+`independent_eval.py` depende de mensagens reais anonimizadas e de revisores
+independentes; não converte os 216 candidatos sintéticos em dados revisados.
+
 `posthoc-stress-v1.jsonl` contém 24 mensagens sintéticas novas, duas por cada
 combinação de categoria e urgência. Foi escrito **depois** de observar dois
 erros de urgência do teste congelado; portanto é um diagnóstico direcionado,
