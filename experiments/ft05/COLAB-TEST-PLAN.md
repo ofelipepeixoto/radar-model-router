@@ -34,7 +34,7 @@ isso como uma opção pronta no notebook inicial.
 | --- | --- | --- |
 | Código | Branch #8 fixada e 30 testes aprovados no Colab | Preparado |
 | Artefatos | Corpus, split, run.json e adaptador íntegros no Drive | Verificar novamente |
-| Teste pessoal | Mensagens novas digitadas no navegador, modelo carregado, respostas e latência salvas | Implementar e executar |
+| Teste pessoal | Mensagens novas digitadas no navegador, modelo carregado, respostas e latência salvas | Notebook e script preparados; GPU pendente |
 | Avaliação independente | Fonte real permitida, duas revisões cegas, adjudicação e relatório | Pendente de dados e pessoas |
 | Tutorial público | Notebook guiado executável por outra conta, sem artefatos privados, com saídas e limites claros | A implementar e homologar |
 
@@ -73,8 +73,9 @@ no navegador e observa GPU/saldo.
 1. Abrir a cópia autorizada do notebook FT05, selecionar GPU e conferir
    unidades disponíveis. A sessão futura pode receber GPU diferente da
    RTX PRO 6000 já observada.
-2. Confirmar Python 3.12, nvidia-smi, torch.cuda.is_available(), VRAM
-   disponível e versões efetivamente importadas. Não exibir tokens.
+2. Confirmar Python 3.12, nvidia-smi, VRAM disponível e versões instaladas.
+   A célula de inferência verifica CUDA após importar Unsloth antes de Torch.
+   Não exibir tokens.
 3. Montar apenas o Drive necessário após inspecionar as células; manter
    run-002-g4 e o teste congelado intocados.
 4. Obter a branch feat/ft05-independent-eval, registrar o SHA e executar
@@ -129,8 +130,8 @@ antes de gastar tempo carregando a base.
 
 ## Fase 3 — teste pessoal do adaptador
 
-**Entregável a implementar:** seção isolada no notebook ou script chamado
-por ele. Ela carrega a base Qwen2.5-1.5B-Instruct na revisão fixada, aplica
+O notebook [FT05-PERSONAL-COLAB.ipynb](FT05-PERSONAL-COLAB.ipynb) chama
+personal_smoke.py. Ele carrega a base Qwen2.5-1.5B-Instruct na revisão fixada, aplica
 o LoRA salvo e recebe uma lista de mensagens digitadas pelo operador.
 Salva em pasta nova e privada personal-smoke-001: mensagens, previsões,
 latência, SHA do adaptador e versão do código. Não recebe rótulos esperados
@@ -187,8 +188,10 @@ ensaio de avaliação.
 - PRs permanecem em rascunho. Treino, GGUF, integração com router,
   deploy e atendimento real ficam fora deste teste.
 
-**Próxima ação:** implementar a seção da fase 3 na PR #8 e revisar o
-pré-voo da fase 2. O operador executa fases 1–3 no Colab Pro pelo PC.
+**Próxima ação:** o operador abre uma cópia do notebook pessoal no Colab Pro,
+confere GPU/saldo e executa as fases 1–3 pelo PC, uma célula de cada vez.
+O notebook e o pré-voo passaram testes estáticos locais, mas a carga de GPU
+dele ainda depende da sessão Pro do operador.
 Depois, entregar em PR separada o notebook público guiado, testes de
 integridade e quickstart. Homologar o tutorial em conta/Drive separados,
 com corpus público e adaptador gerado pelo próprio tutorial, antes de
