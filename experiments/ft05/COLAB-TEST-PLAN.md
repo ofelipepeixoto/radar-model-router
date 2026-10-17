@@ -215,9 +215,15 @@ ensaio de avaliação.
 - PRs permanecem em rascunho. Treino, GGUF, integração com router,
   deploy e atendimento real ficam fora deste teste.
 
-**Próxima ação:** encerrar a sessão de GPU após a releitura confirmada.
-Depois, entregar em PR separada o notebook público guiado, testes de
-integridade e quickstart. Homologar o tutorial em conta/Drive separados,
-com corpus público e adaptador gerado pelo próprio tutorial, antes de
-criar um tag e compartilhar. A fase 4 espera fonte permitida e revisores
-independentes.
+**Próxima ação para o operador:** testar textos fictícios próprios na cópia do
+notebook pessoal, aberta no navegador do PC, com a inferência na GPU do Colab.
+Na Configuração, usar `MESSAGES` novos e uma pasta `OUTPUT_DIR` inexistente,
+executar novamente essa célula e então a etapa 4. Não reutilizar a pasta
+personal-smoke-001. Confirmar JSON e os dois arquivos no Drive. O teste
+anterior de oito mensagens não substitui essa experimentação pessoal.
+
+**Publicação para terceiros (depois):** a PR #9 contém o notebook público,
+testes e quickstart. Homologar em conta/Drive separados, com corpus público
+e adaptador gerado pelo tutorial, antes de criar tag e compartilhar como
+fluxo pronto. Essa homologação não bloqueia o teste pessoal do operador.
+A fase 4 espera fonte permitida e revisores independentes.
