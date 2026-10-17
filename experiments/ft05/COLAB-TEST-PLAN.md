@@ -28,13 +28,39 @@ isso como uma opção pronta no notebook inicial.
 - Ainda faltam dados reais anonimizados, revisores independentes e avaliação
   real executada.
 
+## Teste pessoal relatado em 17/10/2026 (São Paulo)
+
+O operador executou FT05-PERSONAL-COLAB.ipynb no Colab Pro com Python
+3.12.13 e NVIDIA RTX PRO 6000 Blackwell Server Edition. Relatou o commit
+004c29a93d74419295404b96f5a5bb3c148c9e1e, hashes de corpus e split
+íntegros, a revisão fixa da base e as seis versões de pacotes esperadas.
+Os testes de código terminaram sem erro na captura enviada; a saída completa
+do unittest não foi disponibilizada.
+
+A inferência carregou os pesos e devolveu 8/8 JSON válidos. As oito
+categorias previstas correspondem ao tema das mensagens fictícias do
+notebook. Três mensagens sem prazo imediato receberam urgência alta:
+meu-01 (etiqueta apagada sem data), meu-03 (cancelamento em separação sem
+horário de despacho) e meu-05 (erro de perfil sem prazo imediato).
+Os respectivos pares com prazo ou incidente atual também receberam alta:
+meu-02, meu-04 e meu-06. As perguntas futuras meu-07 e meu-08 receberam
+baixa. Isso é uma inspeção qualitativa posterior; não há gabarito cego nem
+taxa de acerto a calcular. Não mudar rótulos ou retreinar com esses casos.
+
+O operador relatou manifest.json e report.json na pasta privada
+personal-smoke-001; o conteúdo desses arquivos não foi lido diretamente
+por este repositório. A primeira inferência levou cerca de 5,0 s com
+carregamento inicial e as seguintes cerca de 0,17–0,22 s, conforme a
+saída compartilhada. O aviso de max_new_tokens/max_length não impediu
+as oito saídas válidas. O piloto segue sem validação para atendimento real.
+
 ## Critérios de aceite
 
 | Marco | Evidência esperada | Situação |
 | --- | --- | --- |
 | Código | Branch #8 fixada e 30 testes aprovados no Colab | Preparado |
 | Artefatos | Corpus, split, run.json e adaptador íntegros no Drive | Verificar novamente |
-| Teste pessoal | Mensagens novas digitadas no navegador, modelo carregado, respostas e latência salvas | Notebook e script preparados; GPU pendente |
+| Teste pessoal | Mensagens fictícias no Colab Pro, modelo carregado, respostas e latência salvas | 8/8 JSON válidos relatados; leitura direta dos arquivos privados pendente |
 | Avaliação independente | Fonte real permitida, duas revisões cegas, adjudicação e relatório | Pendente de dados e pessoas |
 | Tutorial público | Notebook guiado executável por outra conta, sem artefatos privados, com saídas e limites claros | A implementar e homologar |
 
@@ -188,12 +214,9 @@ ensaio de avaliação.
 - PRs permanecem em rascunho. Treino, GGUF, integração com router,
   deploy e atendimento real ficam fora deste teste.
 
-**Próxima ação:** o operador abre uma cópia do notebook pessoal no Colab Pro,
-confere GPU/saldo e executa as fases 1–3 pelo PC, uma célula de cada vez.
-O notebook e o pré-voo passaram testes estáticos locais, mas a carga de GPU
-dele ainda depende da sessão Pro do operador.
-Depois, entregar em PR separada o notebook público guiado, testes de
-integridade e quickstart. Homologar o tutorial em conta/Drive separados,
+**Próxima ação:** conferir a leitura dos dois arquivos privados do teste
+pessoal e encerrar a sessão de GPU. Depois, entregar em PR separada o
+notebook público guiado, testes de integridade e quickstart. Homologar o tutorial em conta/Drive separados,
 com corpus público e adaptador gerado pelo próprio tutorial, antes de
 criar um tag e compartilhar. A fase 4 espera fonte permitida e revisores
 independentes.
