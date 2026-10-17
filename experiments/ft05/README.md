@@ -100,6 +100,9 @@ independentes; não converte os 216 candidatos sintéticos em dados revisados.
 O caminho para o teste pessoal no navegador e o desenho do tutorial para outras
 pessoas criarem seus próprios modelos no Colab estão em
 [`COLAB-TEST-PLAN.md`](COLAB-TEST-PLAN.md).
+O [notebook de teste pessoal](FT05-PERSONAL-COLAB.ipynb) carrega o adaptador
+salvo no Drive privado e faz apenas inferência em mensagens fictícias novas;
+todas as ações externas começam desligadas.
 
 `posthoc-stress-v1.jsonl` contém 24 mensagens sintéticas novas, duas por cada
 combinação de categoria e urgência. Foi escrito **depois** de observar dois
