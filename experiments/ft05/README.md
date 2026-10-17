@@ -52,7 +52,72 @@ grupos, auditoria técnica e a ficha CSV de decisão por caso. O utilitário
 com decisões completas e ao menos 200 casos aprovados. A revisão humana
 efetiva não é inferível dos campos preenchidos. A cópia editada da planilha
 fica privada, fora deste repositório público. O notebook Colab existente
-continua com treino desativado até a promoção e o congelamento do teste.
+contém também um piloto automático separado, descrito abaixo. A revisão humana
+continua necessária para qualquer reivindicação de qualidade operacional.
+
+## Piloto sem planilha: corpus sintético com checagem automática
+
+Para experimentar o treino e a comparação no Colab Pro sem editar 216 linhas,
+use a branch `feat/ft05-automated-synthetic` e o notebook atualizado. O script
+`auto_pilot.py` fixa o SHA exato dos 216 candidatos, exclui oito pedidos
+ambíguos com motivos em código, agrupa famílias semânticas conhecidas e produz
+208 registros sintéticos com `reviewed: false`. Valida IDs, esquema, rótulos,
+unicidade, grupos, tamanho e cobertura de todas as 12 combinações de rótulos
+em treino, validação e teste. A partição é feita por grupo e gravada com hashes.
+
+Teste local, sem Drive, rede, GPU ou instalação:
+
+```sh
+python3 -c "from auto_pilot import write_auto_dataset; print(write_auto_dataset('/tmp/ft05-synthetic-auto.jsonl'))"
+python3 ft05.py /tmp/ft05-synthetic-auto.jsonl /tmp/ft05-auto-frozen --synthetic-auto
+python3 train.py /tmp/ft05-synthetic-auto.jsonl
+```
+
+Escolha destinos inexistentes; se um arquivo já existir, o gerador só o aceita
+quando os bytes conferirem exatamente. A execução no Colab usa uma pasta
+exclusiva no Drive e grava `auto-audit.json`, dataset, manifesto e as três
+partições. O manifesto registra `review_mode: synthetic_machine_checked` e
+`human_reviewed: false`. O caminho de 200–500 casos efetivamente revisados
+continua separado (`--training-reviewed`). Flags de instalação e treino seguem
+desligadas; ativá-las exige observar GPU/saldo e verificar versões compatíveis
+dos pacotes no runtime Pro. O piloto automático é uma **demonstração técnica**.
+O carregador exige `use_exact_model_name=True` e confirma a origem observada:
+sem essa opção, a Unsloth 2026.10.6 substituiu `Qwen/Qwen2.5-1.5B-Instruct`
+por um espelho quantizado e ignorou o SHA fixado. Uma execução anterior a essa
+correção é exploratória e não reproduz o modelo no commit da configuração.
+As mensagens foram escritas e rotuladas sinteticamente na mesma origem; esta
+checagem não estabelece verdade independente nem representatividade, e alguns
+parafraseamentos sem grupo podem permanecer. Métricas do holdout sintético não
+autorizam uso com clientes, ativação no roteador ou publicação de um modelo.
+
+## Diagnóstico posterior do adaptador salvo
+
+`posthoc-stress-v1.jsonl` contém 24 mensagens sintéticas novas, duas por cada
+combinação de categoria e urgência. Foi escrito **depois** de observar dois
+erros de urgência do teste congelado; portanto é um diagnóstico direcionado,
+não uma avaliação cega ou revisão humana. Não foi usado para treino e seus
+resultados não substituem o holdout nem sustentam uma estimativa de desempenho
+real. Os textos não coincidem com os 216 candidatos originais; uma checagem
+textual também recusa similaridade ≥ 0,77, mas não prova independência semântica.
+
+Com o ambiente do Colab já instalado, GPU disponível e `run-002-g4` íntegro,
+use um diretório **novo** no mesmo Drive. Esta etapa carrega a base no SHA da
+execução, aplica o adaptador com PEFT, faz somente inferência e grava três
+arquivos: `predictions.json`, `report.json`, `manifest.json`. Não modifica o
+corpus, o teste congelado, o adaptador ou o Supabase.
+
+```sh
+python3 experiments/ft05/evaluate_saved_adapter.py \
+  /content/drive/MyDrive/FT05/piloto-auto-001/run-002-g4 \
+  /content/drive/MyDrive/FT05/piloto-auto-001/posthoc-stress-001 \
+  --corpus /content/drive/MyDrive/FT05/piloto-auto-001/synthetic-machine-checked.jsonl \
+  --frozen /content/drive/MyDrive/FT05/piloto-auto-001/frozen
+```
+
+O avaliador recusa uma execução de treino incompatível, mudanças no corpus e
+split, troca de pacotes e sobrescrita da saída. Registra hashes do adaptador,
+casos diagnósticos e manifesto anterior. A carga PEFT do adaptador salvo deve
+ser validada no Colab real; testes locais cobrem somente dados e relatório.
 
 ## Colab Pro: fluxo reproduzível e teste congelado
 

@@ -8,8 +8,11 @@ Os pedidos foram redigidos como mensagens plausíveis, sem inserir “fictício�
 “simulado” ou “de teste” no texto que o modelo receberia; a origem sintética
 fica registrada no campo `synthetic`.
 Não mesclar com a fixture de 24 casos nem com os nove cenários ambíguos da
-`REVIEW-SHEET.md`. O corpus candidato não pode ativar treino: todos os registros
-permanecem `reviewed: false`.
+`REVIEW-SHEET.md`. O corpus candidato não pode ativar treino diretamente: todos
+os registros permanecem `reviewed: false`. O piloto separado `auto_pilot.py`
+fixa esta versão por hash e cria um corpus de pesquisa com proveniência
+`synthetic_machine_checked`. Esse caminho não atesta revisão humana nem substitui
+esta planilha para uso operacional.
 
 ## Política proposta `ft05-support-v1`
 

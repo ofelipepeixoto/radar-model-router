@@ -3,8 +3,9 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from ft05 import validate, split, evaluate, strict_json, prepare, normalize, load_frozen, compare
-from train import run, check_config
+from train import MODEL, run, check_config, load_pinned_model
 
 
 def rows():
@@ -68,6 +69,26 @@ class Tests(unittest.TestCase):
     def test_training_gates(self):
         with self.assertRaises(ValueError): validate(rows(), training=True)
         with self.assertRaises(ValueError): check_config({})
+
+    def test_model_loader_keeps_requested_repo_and_revision(self):
+        revision = 'a' * 40
+        class Loader:
+            @staticmethod
+            def from_pretrained(**kwargs):
+                self.assertEqual(kwargs['model_name'], MODEL)
+                self.assertEqual(kwargs['revision'], revision)
+                self.assertIs(kwargs['use_exact_model_name'], True)
+                return SimpleNamespace(config=SimpleNamespace(_name_or_path=MODEL)), object()
+        _, _, loaded_name = load_pinned_model(Loader, revision)
+        self.assertEqual(loaded_name, MODEL)
+
+        class SubstitutingLoader:
+            @staticmethod
+            def from_pretrained(**kwargs):
+                return SimpleNamespace(config=SimpleNamespace(
+                    _name_or_path='unsloth/Qwen2.5-1.5B-Instruct-unsloth-bnb-4bit')), object()
+        with self.assertRaisesRegex(ValueError, 'model_source_changed'):
+            load_pinned_model(SubstitutingLoader, revision)
 
     def test_same_holdout_comparison_counts_improvements_and_regressions(self):
         data = rows()[:3]
