@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from independent_eval import (FIELDS, REVIEW_FIELDS, prepare, read_csv,
+from independent_eval import (FIELDS, REVIEW_FIELDS, prepare, read_csv, sha256,
                               score, seal, write_csv, write_json)
 
 
@@ -64,7 +64,7 @@ class IndependentEvaluationTests(unittest.TestCase):
         write_json(prediction_dir / 'predictions.json', predictions)
         wrong = {'scope': 'independent_private_evaluation', 'sample_sha256': 'bad',
                  'gold_sha256': manifest['gold_sha256'], 'model_inference_executed': True,
-                 'training_performed': False}
+                 'training_performed': False, 'predictions_sha256': sha256(prediction_dir / 'predictions.json')}
         write_json(prediction_dir / 'manifest.json', wrong)
         with self.assertRaisesRegex(ValueError, 'incompatible_prediction_manifest'):
             score(self.bundle, sealed, prediction_dir / 'predictions.json', self.root / 'report')
